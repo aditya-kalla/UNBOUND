@@ -1,0 +1,91 @@
+-- All ranges are [:fromTs, :toTs) in UTC epoch ms. "Local hour" = hour on the clock the
+-- listener actually saw, computed from the stored tz offset (no generated columns /
+-- window functions, so it runs on any SQLite >= 3.24).
+
+totals:
+SELECT
+  COALESCE(SUM(listened_ms), 0) AS listened_ms,
+  COALESCE(SUM(counted), 0) AS plays,
+  COALESCE(SUM(skipped), 0) AS skips,
+  COUNT(DISTINCT CASE WHEN counted = 1 THEN track_id END) AS unique_tracks
+FROM listen WHERE started_at >= :fromTs AND started_at < :toTs;
+
+topTracks:
+SELECT l.track_id, t.title, t.artist_display, COUNT(*) AS plays, SUM(l.listened_ms) AS listened_ms
+FROM listen l JOIN track t ON t.id = l.track_id
+WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY l.track_id ORDER BY plays DESC, listened_ms DESC LIMIT :limit;
+
+topArtists:
+SELECT a.id AS artist_id, a.name, COUNT(*) AS plays, SUM(l.listened_ms) AS listened_ms
+FROM listen l
+JOIN track_artist ta ON ta.track_id = l.track_id AND ta.role = 'MAIN'
+JOIN artist a ON a.id = ta.artist_id
+WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY a.id ORDER BY plays DESC, listened_ms DESC LIMIT :limit;
+
+topGenres:
+SELECT g.genre, COUNT(*) AS plays, SUM(l.listened_ms) AS listened_ms
+FROM listen l JOIN track_genre g ON g.track_id = l.track_id
+WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY g.genre ORDER BY plays DESC, listened_ms DESC LIMIT :limit;
+
+-- Circadian profile: plays and minutes for each local hour 0..23.
+hourHistogram:
+SELECT ((((l.started_at / 1000) + l.tz_offset_min * 60) % 86400) + 86400) % 86400 / 3600 AS hour,
+       COUNT(*) AS plays, COALESCE(SUM(l.listened_ms), 0) AS listened_ms
+FROM listen l
+WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY hour ORDER BY hour;
+
+-- "Your top 2:00 AM focus tracks": window may wrap midnight (e.g. 22 -> 2).
+-- :wrap = 0 when startHour <= endHour (contiguous window), 1 when wrapping.
+topTracksInHourWindow:
+SELECT x.track_id, t.title, t.artist_display, COUNT(*) AS plays, SUM(x.listened_ms) AS listened_ms
+FROM (
+  SELECT l.track_id AS track_id, l.listened_ms AS listened_ms,
+         ((((l.started_at / 1000) + l.tz_offset_min * 60) % 86400) + 86400) % 86400 / 3600 AS hour
+  FROM listen l
+  WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+) x JOIN track t ON t.id = x.track_id
+WHERE (:wrap = 0 AND x.hour >= :startHour AND x.hour < :endHour)
+   OR (:wrap = 1 AND (x.hour >= :startHour OR x.hour < :endHour))
+GROUP BY x.track_id ORDER BY plays DESC, listened_ms DESC LIMIT :limit;
+
+weekdayHistogram:
+SELECT CAST(strftime('%w', (l.started_at / 1000) + l.tz_offset_min * 60, 'unixepoch') AS INTEGER) AS weekday,
+       COUNT(*) AS plays, COALESCE(SUM(l.listened_ms), 0) AS listened_ms
+FROM listen l WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY weekday ORDER BY weekday;
+
+dailyMinutes:
+SELECT strftime('%Y-%m-%d', (l.started_at / 1000) + l.tz_offset_min * 60, 'unixepoch') AS day,
+       COALESCE(SUM(l.listened_ms), 0) AS listened_ms, COUNT(*) AS plays
+FROM listen l WHERE l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY day ORDER BY day;
+
+-- Tracks you skip a lot (needs at least :minStarts listens).
+mostSkipped:
+SELECT l.track_id, t.title, t.artist_display, COUNT(*) AS starts, SUM(l.skipped) AS skips,
+       1.0 * SUM(l.skipped) / COUNT(*) AS skip_rate
+FROM listen l JOIN track t ON t.id = l.track_id
+WHERE l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY l.track_id HAVING COUNT(*) >= :minStarts ORDER BY skip_rate DESC, starts DESC LIMIT :limit;
+
+-- Hyper-fixation: a track played >= :minPlays times on one local day.
+loopedTracks:
+SELECT l.track_id, t.title, t.artist_display,
+       strftime('%Y-%m-%d', (l.started_at / 1000) + l.tz_offset_min * 60, 'unixepoch') AS day,
+       COUNT(*) AS plays
+FROM listen l JOIN track t ON t.id = l.track_id
+WHERE l.counted = 1 AND l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY l.track_id, day HAVING COUNT(*) >= :minPlays ORDER BY plays DESC, day DESC LIMIT :limit;
+
+deviceBreakdown:
+SELECT COALESCE(l.output_device_type, 'UNKNOWN') AS device_type, COUNT(*) AS plays, COALESCE(SUM(l.listened_ms), 0) AS listened_ms
+FROM listen l WHERE l.started_at >= :fromTs AND l.started_at < :toTs
+GROUP BY device_type ORDER BY listened_ms DESC;
+
+recentlyPlayed:
+SELECT l.track_id, MAX(l.started_at) AS last_at
+FROM listen l WHERE l.track_id IS NOT NULL GROUP BY l.track_id ORDER BY last_at DESC LIMIT :limit;

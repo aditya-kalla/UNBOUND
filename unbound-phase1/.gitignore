@@ -1,0 +1,19 @@
+# Rust build artifacts
+target/
+**/target/
+
+# Gradle build artifacts
+build/
+**/build/
+.gradle/
+**/.gradle/
+
+# Native binaries
+*.dll*
+*.so*
+*.dylib*
+
+# IDE & system files
+.idea/
+.DS_Store
+Thumbs.db

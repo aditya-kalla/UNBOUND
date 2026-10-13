@@ -1,0 +1,34 @@
+[package]
+name = "unbound-audio"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "unbound_audio"
+# cdylib: produces the .so/.dll/.dylib the Kotlin JNA bridge loads.
+# staticlib: kept for the future iOS cinterop path.
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+# Cross-platform audio output (WASAPI / CoreAudio / ALSA / AAudio).
+cpal = "0.15"
+# Container/codec decoding (MP3, FLAC, WAV, AAC, Vorbis...).
+symphonia = { version = "0.5", features = ["mp3", "flac", "wav", "aac", "isomp4"] }
+# Lock-free SPSC ring buffer between the decode thread and the audio callback.
+ringbuf = "0.4"
+# High-quality sample rate conversion when decoded rate ≠ device rate.
+rubato = "0.16"
+# Structured logging (prefer over raw eprintln for diagnostics).
+log = "0.4"
+env_logger = "0.11"
+once_cell = "1.19"
+
+lofty = "0.25"
+blake3 = "1.5"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+lto = true
+panic = "unwind"

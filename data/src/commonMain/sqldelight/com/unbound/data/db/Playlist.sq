@@ -1,0 +1,123 @@
+CREATE TABLE playlist_folder (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  parent_id INTEGER REFERENCES playlist_folder(id) ON DELETE CASCADE,   -- nested folders
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL
+);
+
+CREATE TABLE playlist (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  folder_id INTEGER REFERENCES playlist_folder(id) ON DELETE SET NULL,
+  custom_cover_uri TEXT,
+  is_pinned INTEGER NOT NULL DEFAULT 0,
+  pin_order INTEGER NOT NULL DEFAULT 0,
+  kind TEXT NOT NULL DEFAULT 'MANUAL',    -- MANUAL | SMART (rules_json; reserved for Phase 4)
+  rules_json TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- Order uses gapped integers (1024 apart) so a drag-reorder is ONE row update, not N.
+CREATE TABLE playlist_item (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  playlist_id INTEGER NOT NULL REFERENCES playlist(id) ON DELETE CASCADE,
+  track_id INTEGER NOT NULL REFERENCES track(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL,
+  added_at INTEGER NOT NULL
+);
+CREATE INDEX playlist_item_order ON playlist_item(playlist_id, position);
+CREATE INDEX playlist_item_track ON playlist_item(track_id);
+
+CREATE TABLE liked_track (
+  track_id INTEGER PRIMARY KEY REFERENCES track(id) ON DELETE CASCADE,
+  liked_at INTEGER NOT NULL
+);
+
+CREATE TABLE search_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  query TEXT NOT NULL,
+  searched_at INTEGER NOT NULL
+);
+CREATE INDEX search_history_time ON search_history(searched_at);
+
+insertPlaylist:
+INSERT INTO playlist(name, description, folder_id, created_at, updated_at) VALUES (:name, :description, :folderId, :now, :now);
+
+lastInsertedId:
+SELECT last_insert_rowid();
+
+renamePlaylist:
+UPDATE playlist SET name = :name, description = :description, updated_at = :now WHERE id = :id;
+
+movePlaylistToFolder:
+UPDATE playlist SET folder_id = :folderId, updated_at = :now WHERE id = :id;
+
+deletePlaylist:
+DELETE FROM playlist WHERE id = :id;
+
+setPinned:
+UPDATE playlist SET is_pinned = :pinned, pin_order = :pinOrder WHERE id = :id;
+
+pinnedCount:
+SELECT COUNT(*) FROM playlist WHERE is_pinned = 1;
+
+allPlaylists:
+SELECT p.*, (SELECT COUNT(*) FROM playlist_item i WHERE i.playlist_id = p.id) AS item_count
+FROM playlist p ORDER BY p.is_pinned DESC, p.pin_order, p.name COLLATE NOCASE;
+
+insertFolder:
+INSERT INTO playlist_folder(name, parent_id, sort_order, created_at) VALUES (:name, :parentId, :sortOrder, :now);
+
+allFolders:
+SELECT * FROM playlist_folder ORDER BY parent_id, sort_order, name COLLATE NOCASE;
+
+deleteFolder:
+DELETE FROM playlist_folder WHERE id = :id;
+
+playlistItems:
+SELECT i.id AS item_id, i.position, t.id AS track_id, t.title, t.artist_display, t.duration_ms, t.artwork_id, t.uri, t.is_missing
+FROM playlist_item i JOIN track t ON t.id = i.track_id
+WHERE i.playlist_id = :playlistId ORDER BY i.position, i.id;
+
+maxItemPosition:
+SELECT MAX(position) FROM playlist_item WHERE playlist_id = :playlistId;
+
+insertItem:
+INSERT INTO playlist_item(playlist_id, track_id, position, added_at) VALUES (:playlistId, :trackId, :position, :now);
+
+setItemPosition:
+UPDATE playlist_item SET position = :position WHERE id = :id;
+
+deleteItem:
+DELETE FROM playlist_item WHERE id = :id;
+
+-- Rebalance when a gap is exhausted: the repository reads ids in order and rewrites positions
+-- 1024, 2048, ... via setItemPosition inside ONE transaction. (A correlated self-UPDATE is
+-- unsafe: SQLite may read rows it already modified.)
+playlistItemIdsOrdered:
+SELECT id FROM playlist_item WHERE playlist_id = :playlistId ORDER BY position, id;
+
+like:
+INSERT OR IGNORE INTO liked_track(track_id, liked_at) VALUES (:trackId, :now);
+
+unlike:
+DELETE FROM liked_track WHERE track_id = :trackId;
+
+isLiked:
+SELECT EXISTS(SELECT 1 FROM liked_track WHERE track_id = :trackId);
+
+likedTracks:
+SELECT t.id, t.title, t.artist_display, t.duration_ms, t.artwork_id, t.uri, t.is_missing, l.liked_at
+FROM liked_track l JOIN track t ON t.id = l.track_id ORDER BY l.liked_at DESC;
+
+addSearchHistory:
+INSERT INTO search_history(query, searched_at) VALUES (:query, :now);
+
+recentSearches:
+SELECT query, MAX(searched_at) AS last_at FROM search_history GROUP BY query ORDER BY last_at DESC LIMIT :limit;
+
+clearSearchHistory:
+DELETE FROM search_history;

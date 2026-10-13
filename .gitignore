@@ -1,0 +1,27 @@
+# Local JDK
+jdk21/
+
+# Rust build artifacts
+target/
+**/target/
+
+# Gradle build artifacts
+build/
+**/build/
+.gradle/
+**/.gradle/
+.kotlin/
+**/.kotlin/
+
+# Native binaries
+*.dll
+*.dll.old
+*.so
+*.dylib
+*.exe
+
+# IDE & system files
+.idea/
+**/.idea/
+.DS_Store
+Thumbs.db

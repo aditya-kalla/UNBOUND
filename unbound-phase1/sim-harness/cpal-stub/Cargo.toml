@@ -1,0 +1,4 @@
+[package]
+name = "cpal"
+version = "0.15.99"
+edition = "2021"

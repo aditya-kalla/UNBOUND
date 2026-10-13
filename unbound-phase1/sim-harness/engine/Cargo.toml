@@ -1,0 +1,28 @@
+[package]
+name = "unbound-audio"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "unbound_audio"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+old = []
+
+[dependencies]
+cpal = { path = "../cpal-stub" }
+symphonia = { version = "0.5", features = ["mp3", "flac", "wav", "aac", "isomp4"] }
+ringbuf = "0.4"
+rubato = "0.16"
+log = "0.4"
+env_logger = "0.11"
+lofty = "0.25"
+blake3 = "1.5"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+lto = true
+panic = "unwind"
