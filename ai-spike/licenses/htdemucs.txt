@@ -1,0 +1,9 @@
+Model: Demucs v4 (htdemucs / htdemucs_ft)
+Source URL: https://github.com/facebookresearch/demucs
+Weights URL: https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/...
+Fetch Date: 2026-10-14
+Code License: MIT License (Meta Platforms, Inc.)
+Weights License: No separate license stated for weights. Repository LICENSE is MIT.
+Training Data: MUSDB18-HQ (CC BY-NC-SA 4.0 / non-commercial) + internal 800-song dataset (for _ft).
+Training Data License Concerns: MUSDB18-HQ contains copyright tracks licensed strictly for non-commercial research under CC BY-NC-SA 4.0. Derivative work taint creates commercial copyright risk.
+Verdict: NEEDS LEGAL REVIEW

@@ -1,0 +1,9 @@
+Model: Sentence-Transformers all-MiniLM-L6-v2
+Source URL: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+Weights URL: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
+Fetch Date: 2026-10-14
+Code License: Apache 2.0 (UKPLab / HuggingFace)
+Weights License: "apache-2.0" (Hugging Face model card explicitly states license: apache-2.0).
+Training Data: 1 Billion sentence pairs from MS MARCO, S2ORC, StackExchange, GooAQ, Yahoo Answers.
+Training Data License Concerns: Permissive open text datasets. Clean commercial provenance.
+Verdict: SHIPPABLE

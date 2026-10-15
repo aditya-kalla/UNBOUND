@@ -1,0 +1,101 @@
+name: CI - Cross-Platform Audio Engine & ML Link Test
+
+# Sample workflow for verifying Rust native core + ONNX Runtime linkage
+# across macOS, iOS, Android, and Windows.
+# Note: Committed as sample workflow per spike task T7. Do not enable on main branch.
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+
+jobs:
+  macos-and-ios:
+    name: Build & Link Test (macOS + iOS)
+    runs-on: macos-14 # Apple Silicon runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: |
+            aarch64-apple-darwin
+            x86_64-apple-darwin
+            aarch64-apple-ios
+            aarch64-apple-ios-sim
+
+      - name: Cache Cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-apple-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Test DSP & Autoplay Crates (Host macOS)
+        run: |
+          cargo test --release --manifest-path ai-spike/xray-rs/Cargo.toml
+          cargo test --release --manifest-path ai-spike/autoplay-rs/Cargo.toml
+
+      - name: Check iOS Static Library Target (aarch64-apple-ios)
+        run: |
+          cargo check --target aarch64-apple-ios --manifest-path ai-spike/xray-rs/Cargo.toml
+          cargo check --target aarch64-apple-ios --manifest-path ai-spike/autoplay-rs/Cargo.toml
+
+      - name: Link Test iOS Simulator Target (aarch64-apple-ios-sim)
+        run: |
+          cargo build --target aarch64-apple-ios-sim --release --manifest-path ai-spike/xray-rs/Cargo.toml
+          cargo build --target aarch64-apple-ios-sim --release --manifest-path ai-spike/autoplay-rs/Cargo.toml
+
+  android:
+    name: Build & Link Test (Android NDK)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: |
+            aarch64-linux-android
+            armv7-linux-androideabi
+            x86_64-linux-android
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+          add-to-path: true
+
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Build Android Targets (xray-rs & autoplay-rs)
+        run: |
+          cargo ndk -t arm64-v8a -t armeabi-v7a -o ./jniLibs build --release --manifest-path ai-spike/xray-rs/Cargo.toml
+          cargo ndk -t arm64-v8a -t armeabi-v7a -o ./jniLibs build --release --manifest-path ai-spike/autoplay-rs/Cargo.toml
+
+  windows:
+    name: Build & Test (Windows x86_64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Run Windows Unit Tests & Benchmarks
+        run: |
+          cargo test --release --manifest-path ai-spike/xray-rs/Cargo.toml
+          cargo test --release --manifest-path ai-spike/autoplay-rs/Cargo.toml

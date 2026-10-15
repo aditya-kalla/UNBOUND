@@ -1,0 +1,9 @@
+Model: LAION-CLAP (clap-htsat-unfused)
+Source URL: https://huggingface.co/laion/clap-htsat-unfused
+Weights URL: https://huggingface.co/laion/clap-htsat-unfused
+Fetch Date: 2026-10-14
+Code License: MIT License (LAION-AI)
+Weights License: "apache-2.0" (Hugging Face model card metadata explicitly states license: apache-2.0).
+Training Data: LAION-Audio-630K (AudioSet, Freesound, BBC Sound Effects, Epidemic Sound).
+Training Data License Concerns: AudioSet clips are scraped from YouTube. YouTube terms of service prohibit commercial redistribution of raw audio, though model weights are treated as non-infringing representations in US jurisdiction.
+Verdict: SHIPPABLE

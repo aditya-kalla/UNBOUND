@@ -1,19 +1,177 @@
-# Rust build artifacts
+# =============================================================================
+# PROJECT UNBOUND (Phase 1) - Git Ignore Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Local JDK & SDK
+# -----------------------------------------------------------------------------
+jdk*/
+**/jdk*/
+local.properties
+**/local.properties
+*.hprof
+
+# -----------------------------------------------------------------------------
+# Rust Build Artifacts
+# -----------------------------------------------------------------------------
 target/
 **/target/
+**/*.rs.bk
 
-# Gradle build artifacts
+# -----------------------------------------------------------------------------
+# Gradle & Kotlin Build Artifacts
+# -----------------------------------------------------------------------------
 build/
 **/build/
 .gradle/
 **/.gradle/
+.kotlin/
+**/.kotlin/
+*.class
+# Preserve Gradle wrapper jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
 
-# Native binaries
-*.dll*
-*.so*
-*.dylib*
+# -----------------------------------------------------------------------------
+# Native Binaries & Build Objects
+# -----------------------------------------------------------------------------
+*.dll
+*.dll.*
+*.so
+*.so.*
+*.dylib
+*.dylib.*
+*.exe
+*.lib
+*.pdb
+*.exp
+*.ilk
+*.obj
+*.o
+*.a
+*.d
+*.timestamp
+*.rlib
+*.rmeta
+cmake-build-*/
+.cxx/
+**/.cxx/
 
-# IDE & system files
+# -----------------------------------------------------------------------------
+# Python Environments & Bytecode (AI Spike, scripts)
+# -----------------------------------------------------------------------------
+.venv/
+**/.venv/
+venv/
+**/venv/
+env/
+**/env/
+ENV/
+**/ENV/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+**/.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+
+# -----------------------------------------------------------------------------
+# AI / ML Models, Weights, Embeddings & Large Checkpoints (>100MB / non-code)
+# -----------------------------------------------------------------------------
+*.onnx
+*.onnx.data
+*.ort
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.h5
+*.pb
+*.tflite
+*.weights
+*.npz
+*.npy
+*.pkl
+*.pickle
+models/
+**/models/
+
+# -----------------------------------------------------------------------------
+# Audio & Media Byproducts (Test Music, Sample Tracks, Separated Stems)
+# -----------------------------------------------------------------------------
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.wma
+*.aiff
+*.alac
+*.opus
+*.mid
+*.midi
+*.mp4
+*.mkv
+*.avi
+*.mov
+
+# AI Spike output datasets & stem generations
+ai-spike/data/
+**/ai-spike/data/
+ai-spike/out/
+**/ai-spike/out/
+stems/
+**/stems/
+out/
+**/out/
+
+# -----------------------------------------------------------------------------
+# Archives & Compressed Backups
+# -----------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.gz
+*.bz2
+
+# -----------------------------------------------------------------------------
+# Logs, Benchmark Outputs & Test Execution Byproducts
+# -----------------------------------------------------------------------------
+*.log
+**/*.log
+logs/
+**/logs/
+reports/
+**/reports/
+test-results/
+**/test-results/
+
+# -----------------------------------------------------------------------------
+# IDE & System Files
+# -----------------------------------------------------------------------------
 .idea/
+**/.idea/
+.vscode/
+**/.vscode/
 .DS_Store
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+scratch/
+**/scratch/
+

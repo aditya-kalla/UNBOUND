@@ -1,0 +1,12 @@
+[package]
+name = "xray-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hound = "3.5"
+rustfft = "6.2"
+
+[[bin]]
+name = "xray_bench"
+path = "src/main.rs"

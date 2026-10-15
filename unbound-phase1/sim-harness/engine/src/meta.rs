@@ -139,28 +139,35 @@ fn extract_multi_strings(tag: &Tag, key: ItemKey) -> Vec<String> {
     results
 }
 
-fn detect_codec(file_type: FileType, path: &Path) -> String {
+pub fn map_mp4_codec(codec: Option<lofty::mp4::Mp4Codec>) -> (&'static str, bool) {
+    match codec {
+        Some(lofty::mp4::Mp4Codec::ALAC) => ("alac", true),
+        Some(lofty::mp4::Mp4Codec::AAC) => ("aac", false),
+        _ => ("other", false),
+    }
+}
+
+fn detect_codec(file_type: FileType, path: &Path) -> (String, bool) {
     match file_type {
-        FileType::Mpeg => "mp3".to_string(),
-        FileType::Flac => "flac".to_string(),
-        FileType::Aac => "aac".to_string(),
-        FileType::Vorbis => "vorbis".to_string(),
-        FileType::Opus => "opus".to_string(),
-        FileType::Wav => "wav".to_string(),
-        FileType::Aiff => "aiff".to_string(),
-        FileType::Ape => "ape".to_string(),
-        FileType::WavPack => "wavpack".to_string(),
+        FileType::Mpeg => ("mp3".to_string(), false),
+        FileType::Flac => ("flac".to_string(), true),
+        FileType::Aac => ("aac".to_string(), false),
+        FileType::Vorbis => ("vorbis".to_string(), false),
+        FileType::Opus => ("opus".to_string(), false),
+        FileType::Wav => ("wav".to_string(), true),
+        FileType::Aiff => ("aiff".to_string(), true),
+        FileType::Ape => ("ape".to_string(), true),
+        FileType::WavPack => ("wavpack".to_string(), true),
         FileType::Mp4 => {
             if let Ok(mut f) = File::open(path) {
                 if let Ok(mp4_file) = lofty::mp4::Mp4File::read_from(&mut f, lofty::config::ParseOptions::default()) {
-                    if mp4_file.properties().codec() == Some(lofty::mp4::Mp4Codec::ALAC) {
-                        return "alac".to_string();
-                    }
+                    let (c, lossless) = map_mp4_codec(mp4_file.properties().codec());
+                    return (c.to_string(), lossless);
                 }
             }
-            "aac".to_string()
+            ("other".to_string(), false)
         }
-        _ => "other".to_string(),
+        _ => ("other".to_string(), false),
     }
 }
 
@@ -266,11 +273,7 @@ pub fn read_metadata(path: &Path, art_dir: Option<&Path>) -> Result<MetaSuccess,
 
     let properties = tagged_file.properties();
     let file_type = tagged_file.file_type();
-    let codec = detect_codec(file_type, path);
-    let lossless = matches!(
-        codec.as_str(),
-        "flac" | "wav" | "aiff" | "ape" | "wavpack" | "alac"
-    );
+    let (codec, lossless) = detect_codec(file_type, path);
 
     // Audio properties
     let duration_ms = properties.duration().as_millis() as i64;
@@ -697,5 +700,13 @@ mod tests {
         assert!(json_str.contains("\"ok\":true"));
         assert!(json_str.contains("\"title\":\"Unicode Song\""));
         meta_free_string(ptr);
+    }
+
+    #[test]
+    fn test_mp4_codec_mapping() {
+        use lofty::mp4::Mp4Codec;
+        assert_eq!(map_mp4_codec(Some(Mp4Codec::ALAC)), ("alac", true));
+        assert_eq!(map_mp4_codec(Some(Mp4Codec::AAC)), ("aac", false));
+        assert_eq!(map_mp4_codec(None), ("other", false));
     }
 }

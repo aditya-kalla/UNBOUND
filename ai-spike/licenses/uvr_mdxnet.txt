@@ -1,0 +1,9 @@
+Model: UVR MDX-Net (e.g. UVR-MDX-NET_Main_340.onnx)
+Source URL: https://github.com/Anjok07/ultimatevocalremovergui
+Weights URL: https://github.com/TRvlS/model_repo / UVR download mirrors
+Fetch Date: 2026-10-14
+Code License: MIT License (KUIELab / UVR GUI)
+Weights License: No explicit license file or grant accompanies community model weights.
+Training Data: MDX Challenge 2021 dataset (MUSDB18-HQ) + private scraped/stem tracks.
+Training Data License Concerns: Trained on non-commercial competition data and unverified private stems. Absence of explicit commercial license grant.
+Verdict: NEEDS LEGAL REVIEW

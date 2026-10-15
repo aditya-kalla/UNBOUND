@@ -46,6 +46,8 @@ expect class AudioEngine() {
 
 enum class PlaybackState { IDLE, PLAYING, PAUSED, ENDED, ERROR }
 
+class AudioEngineException(val errorCode: Int, message: String) : RuntimeException(message)
+
 /**
  * Receives raw PCM audio chunks (~32 ms each) from the native engine's
  * dedicated dispatch thread (`unbound-pcm-dispatch`), one call at a time.

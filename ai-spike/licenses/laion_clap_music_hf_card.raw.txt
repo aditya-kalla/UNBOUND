@@ -1,0 +1,6 @@
+Source URL: https://huggingface.co/lukewys/laion_clap/raw/main/README.md
+Fetch Date: 2026-10-14T17:53:23.011731+00:00
+
+---
+license: cc0-1.0
+---

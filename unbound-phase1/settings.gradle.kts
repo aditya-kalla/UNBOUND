@@ -13,9 +13,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "unbound"
+rootProject.name = "unbound-phase1"
 
 include(":shared")
-include(":data")
 // include(":androidApp")   // added in Phase 3
 // include(":desktopApp")   // added in Phase 3
+

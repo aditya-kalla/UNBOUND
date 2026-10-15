@@ -57,7 +57,7 @@ internal class NativeAudioEngineBridge(libraryName: String) {
      *  -6 device config, -7 stream, -8 resampler, -9 internal. */
     fun play(uri: String) {
         val code = lib.engine_play(handle, uri)
-        if (code != 0) throw IllegalStateException("engine_play failed for '$uri' (code $code)")
+        if (code != 0) throw AudioEngineException(code, "engine_play failed for '$uri' (code $code)")
     }
     fun pause() = lib.engine_pause(handle)
     fun resume() = lib.engine_resume(handle)

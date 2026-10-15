@@ -1,0 +1,90 @@
+# =============================================================================
+# PROJECT UNBOUND - AI Spike Git Ignore Configuration
+# =============================================================================
+
+# Python virtual environment & caches
+.venv/
+**/.venv/
+venv/
+**/venv/
+env/
+**/env/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+.ipynb_checkpoints/
+
+# Heavy AI model weights, checkpoints, embeddings & caches (>100MB / non-source)
+models/
+**/models/
+*.onnx
+*.onnx.data
+*.ort
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.h5
+*.pb
+*.tflite
+*.weights
+*.npz
+*.npy
+*.pkl
+*.pickle
+
+# Test audio tracks, real datasets & stem separation outputs
+data/
+**/data/
+out/
+**/out/
+# Preserve crate JSON fixtures in autoplay-rs
+!autoplay-rs/data/
+!autoplay-rs/data/**
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.wma
+*.aiff
+*.alac
+*.opus
+*.mid
+*.midi
+*.mp4
+*.mkv
+
+# Rust build targets (ort-check, xray-rs, autoplay-rs)
+target/
+**/target/
+**/*.rs.bk
+
+# Archives & compressed backups
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.rar
+
+# Execution logs & benchmark traces
+logs/
+**/logs/
+*.log
+
+# IDE & OS files
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+*.tmp
+*.bak

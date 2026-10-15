@@ -1,0 +1,9 @@
+Model: MS-CLAP (Microsoft CLAP 2022/2023)
+Source URL: https://github.com/microsoft/CLAP
+Weights URL: https://huggingface.co/microsoft/msclap
+Fetch Date: 2026-10-14
+Code License: MIT License (Microsoft Corporation)
+Weights License: "ms-pl" (Microsoft Public License, HF model card metadata).
+Training Data: AudioSet, Freesound, SoundBible.
+Training Data License Concerns: MS-PL has reciprocal terms for source code redistribution; compliant for binary distribution.
+Verdict: SHIPPABLE

@@ -1,0 +1,9 @@
+Model: LAION-CLAP Music Checkpoint (music_audioset_epoch_15_esc_90.14.pt)
+Source URL: https://huggingface.co/lukewys/laion_clap
+Weights URL: https://huggingface.co/lukewys/laion_clap/blob/main/music_audioset_epoch_15_esc_90.14.pt
+Fetch Date: 2026-10-14
+Code License: MIT License
+Weights License: "cc0-1.0" (Hugging Face cardData explicitly declares license: cc0-1.0 Public Domain).
+Training Data: LAION-Audio-630K music subset + AudioSet music.
+Training Data License Concerns: Same YouTube/AudioSet web-scraping consideration as base CLAP.
+Verdict: SHIPPABLE

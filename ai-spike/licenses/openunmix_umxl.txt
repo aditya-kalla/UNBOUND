@@ -1,0 +1,9 @@
+Model: Open-Unmix UMXL (Extra Data Large)
+Source URL: https://github.com/sigsep/open-unmix-pytorch
+Weights URL: https://zenodo.org/records/5069601
+Fetch Date: 2026-10-14
+Code License: MIT License
+Weights License: "cc-by-nc-sa-4.0" (Open-Unmix README: 'Note, that the weights are only licensed for non-commercial use (CC BY-NC-SA 4.0)'; Zenodo 5069601 metadata: 'cc-by-nc-sa-4.0').
+Training Data: MUSDB18-HQ + private compressed stems dataset.
+Training Data License Concerns: Explicitly non-commercial (NC). Commercial use strictly prohibited by license grant.
+Verdict: NOT SHIPPABLE

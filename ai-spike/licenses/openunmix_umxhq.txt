@@ -1,0 +1,9 @@
+Model: Open-Unmix UMXHQ (4-target: vocals, drums, bass, other)
+Source URL: https://github.com/sigsep/open-unmix-pytorch
+Weights URL: https://zenodo.org/records/3370486
+Fetch Date: 2026-10-14
+Code License: MIT License (Inria: Fabian-Robert Stöter, Antoine Liutkus)
+Weights License: "mit-license" (Zenodo Record 3370486 metadata explicitly declares MIT).
+Training Data: MUSDB18-HQ (Zenodo 3338373, licensed as 'other-nc' / CC BY-NC-SA 4.0).
+Training Data License Concerns: While Inria marked the Zenodo weights record as MIT, the underlying training audio MUSDB18-HQ is non-commercial research-only. Commercial distribution creates potential copyright taint unless fair use / non-derivative status is established.
+Verdict: NEEDS LEGAL REVIEW

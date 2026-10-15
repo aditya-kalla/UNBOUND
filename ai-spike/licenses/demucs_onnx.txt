@@ -1,0 +1,9 @@
+Model: Demucs ONNX Community Ports (demucs.onnx / adefossez/HTDemucs)
+Source URL: https://huggingface.co/adefossez/HTDemucs
+Weights URL: https://huggingface.co/adefossez/HTDemucs
+Fetch Date: 2026-10-14
+Code License: MIT License
+Weights License: None stated in Hugging Face model card.
+Training Data: Converted from Meta htdemucs checkpoints (trained on MUSDB18-HQ).
+Training Data License Concerns: Inherits MUSDB18-HQ research-only non-commercial derivative risk.
+Verdict: NEEDS LEGAL REVIEW

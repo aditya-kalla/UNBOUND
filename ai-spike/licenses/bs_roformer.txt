@@ -1,0 +1,9 @@
+Model: BS-RoFormer / Mel-RoFormer Community Checkpoints
+Source URL: https://github.com/ZFTurbo/Music-Source-Separation-Training
+Weights URL: https://huggingface.co/viperx97 / ZFTurbo releases
+Fetch Date: 2026-10-14
+Code License: MIT License (Roman Solovyev / ZFTurbo)
+Weights License: No explicit license grant for weights; released for research/competition.
+Training Data: Large private scraped multi-track audio datasets + MUSDB18-HQ.
+Training Data License Concerns: Unclear copyright status of commercial songs used in community training sets.
+Verdict: NEEDS LEGAL REVIEW

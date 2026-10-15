@@ -155,9 +155,19 @@ fn t7_bad_file_reports_an_error_code() {
     let r = play(h, "/definitely/not/here.mp3");
     let state = engine_state(h);
     engine_release(h);
-    println!("[errors] playing a missing file returned code {r} (want negative), state {state} (want 4 ERROR)");
-    assert!(r < 0);
+    println!("[errors] playing a missing file returned code {r} (want -1), state {state} (want 4 ERROR)");
+    assert_eq!(r, -1);
     assert_eq!(state, 4);
+
+    let not_audio = std::env::temp_dir().join("not_audio.mp3");
+    std::fs::write(&not_audio, b"This is plain text, not an MP3 file.").unwrap();
+    let h2 = engine_new();
+    let r2 = play(h2, not_audio.to_str().unwrap());
+    let state2 = engine_state(h2);
+    engine_release(h2);
+    println!("[errors] playing text file renamed .mp3 returned code {r2} (want -2), state {state2} (want 4 ERROR)");
+    assert_eq!(r2, -2);
+    assert_eq!(state2, 4);
 }
 
 #[test]
@@ -204,7 +214,13 @@ fn t12_engine_state_and_duration_lifecycle() {
     let dur = engine_duration_ms(h);
     println!("[state-dur] duration reported: {dur} ms (want ~6000)");
     assert!((5_900..=6_100).contains(&dur));
-    assert_eq!(engine_state(h), 1, "state after play should be 1 PLAYING");
+    let t_start = std::time::Instant::now();
+    let mut st = engine_state(h);
+    while st != 1 && t_start.elapsed() < Duration::from_secs(1) {
+        sleep_ms(10);
+        st = engine_state(h);
+    }
+    assert_eq!(st, 1, "state after play should be 1 PLAYING");
 
     engine_pause(h);
     assert_eq!(engine_state(h), 2, "state after pause should be 2 PAUSED");
